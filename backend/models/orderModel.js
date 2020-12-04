@@ -17,10 +17,12 @@ const orderSchema = mongoose.Schema(
       },
     ],
     shippingAddress: {
-      address: { type: String, required: true },
-      city: { type: String, required: true },
-      postCode: { type: String, required: true },
-      country: { type: String, required: true },
+      name: { type: String },
+      address: { type: String },
+      city: { type: String },
+      postCode: { type: String },
+      country: { type: String },
+      phoneNumber: { type: String },
     },
     paymentMethod: { type: String, required: true },
     paymentResult: {

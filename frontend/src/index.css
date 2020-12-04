@@ -42,33 +42,6 @@ p+p {
     margin-left: 0.2em;
 }
 
-.my-row {
-
-    background: green;
-}
-
-.my-col {
-
-    background: pink;
-}
-
-.my-col-name {
-
-    background: yellow;
-}
-
-.my-col-blue {
-
-    background: blue;
-}
-
-.row {
-    height: 100%;
-   
-}
-
-.row-yellow p {
-    margin: 0;
-    padding:0;
-  text-align: center;
+p+strong {
+    margin-top: 1em;
 }
