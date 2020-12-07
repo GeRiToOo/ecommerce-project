@@ -23,7 +23,6 @@ const PaymentScreen = ({ history }) => {
     history.push('/placeorder');
   };
 
-  console.log(paymentMethod);
   return (
     <FormContainer>
       <CheckoutSteps step1 step2 step3 />
@@ -39,6 +38,7 @@ const PaymentScreen = ({ history }) => {
               name="paymentMethod"
               value="PayPal"
               checked
+              onChange={console.log('PayPal')}
               onClick={(e) => setPaymentMethod(e.target.value)}
             ></Form.Check>
             <Form.Check
@@ -47,6 +47,7 @@ const PaymentScreen = ({ history }) => {
               id="Stripe"
               name="paymentMethod"
               value="Stripe"
+              onChange={console.log('Stripe')}
               onClick={(e) => setPaymentMethod(e.target.value)}
             ></Form.Check>
           </Col>

@@ -74,6 +74,7 @@ const CartScreen = ({ match, location, history }) => {
                   </Col>
                   <Col md={2}>
                     <Button
+                      className="mt-2"
                       type="button"
                       variant="light"
                       onClick={() => {

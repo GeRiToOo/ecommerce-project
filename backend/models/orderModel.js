@@ -2,7 +2,12 @@ import mongoose from 'mongoose';
 
 const orderSchema = mongoose.Schema(
   {
-    user: { type: mongoose.Schema.Types.ObjectId, required: true, ref: 'User' },
+    user: {
+      type: mongoose.Schema.Types.ObjectId,
+      required: true,
+      index: true,
+      ref: 'User',
+    },
     orderItems: [
       {
         name: { type: String, required: true },

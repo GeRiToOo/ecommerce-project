@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import {
   Button,
   Row,
@@ -15,8 +15,10 @@ import { createOrder } from '../actions/orderActions';
 
 const PlaceOrderScreen = ({ history }) => {
   const dispatch = useDispatch();
+  // Get cart details from Global State
   const cart = useSelector((state) => state.cart);
 
+  // if missing shipping or payment information navigate user to ...
   if (!cart.shippingAddress.address) {
     history.push('/shipping');
   } else if (!cart.paymentMethod) {
@@ -43,12 +45,10 @@ const PlaceOrderScreen = ({ history }) => {
 
   useEffect(() => {
     if (success) {
-      history.push(`/order/${order._id}`);
+      history.push(`/orders/${order._id}`);
     }
     // eslint-disable-next-line
   }, [history, success]);
-
-  console.log(cart.shippingAddress.country);
 
   const placeOrderHandler = () => {
     dispatch(
@@ -56,10 +56,10 @@ const PlaceOrderScreen = ({ history }) => {
         orderItems: cart.cartItems,
         shippingAddress: cart.shippingAddress,
         paymentMethod: cart.paymentMethod,
-        itemsPrice: cart.itemsPrice,
-        shippingPrice: cart.shippingPrice,
-        taxPrice: cart.taxPrice,
-        totalPrice: cart.totalPrice,
+        itemsPrice: Number(cart.itemsPrice),
+        shippingPrice: Number(cart.shippingPrice),
+        taxPrice: Number(cart.taxPrice),
+        totalPrice: Number(cart.totalPrice),
       })
     );
   };
@@ -136,7 +136,7 @@ const PlaceOrderScreen = ({ history }) => {
                   disabled={cart.cartItems === 0}
                   onClick={placeOrderHandler}
                 >
-                  Place Order
+                  Process to Payment
                 </Button>
               </ListGroup.Item>
             </ListGroup>
@@ -153,7 +153,7 @@ const PlaceOrderScreen = ({ history }) => {
               ) : (
                 <ListGroup variant="flush">
                   {cart.cartItems.map((item, index) => (
-                    <ListGroup.Item key="index">
+                    <ListGroup.Item key={index}>
                       <Row className="pt-3">
                         <Col md={2}>
                           <Image
