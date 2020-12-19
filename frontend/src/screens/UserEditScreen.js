@@ -27,8 +27,6 @@ const UserEditScreen = ({ match, history }) => {
     success: successUpdate,
   } = userUpdate;
 
-  console.log(isAdmin);
-
   useEffect(() => {
     if (successUpdate) {
       dispatch({ type: USER_UPDATE_RESET });

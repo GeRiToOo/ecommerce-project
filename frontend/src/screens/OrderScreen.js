@@ -1,7 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import { PayPalButton } from 'react-paypal-button-v2';
 import axios from 'axios';
-import { Row, Col, ListGroup, Image, Card, Alert } from 'react-bootstrap';
+import {
+  Row,
+  Col,
+  ListGroup,
+  Image,
+  Card,
+  Alert,
+  Button,
+} from 'react-bootstrap';
 import { Link } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import Loader from '../components/Loader';
@@ -10,20 +18,31 @@ import {
   payOrder,
   deliverOrder,
 } from '../actions/orderActions';
-import { ORDER_PAY_RESET } from '../constants/orderConstants';
+import {
+  ORDER_PAY_RESET,
+  ORDER_DELIVER_RESET,
+} from '../constants/orderConstants';
 
-const OrderScreen = ({ match }) => {
+const OrderScreen = ({ match, history }) => {
   const orderId = match.params.id;
   const dispatch = useDispatch();
   const [sdkReady, setSdkReady] = useState(false);
+
+  // GET user details from global State
+  const userLogin = useSelector((state) => state.userLogin);
+  const { userInfo } = userLogin;
 
   // GET order details from global State
   const orderDetails = useSelector((state) => state.orderDetails);
   const { order, loading, error } = orderDetails;
 
-  // GET order details from global State
+  // GET order's payment details from global State
   const orderPay = useSelector((state) => state.orderPay);
   const { loading: loadingPay, success: successPay } = orderPay;
+
+  // GET order' delivery details from global State
+  const orderDeliver = useSelector((state) => state.orderDeliver);
+  const { loading: loadingDeliver, success: successDeliver } = orderDeliver;
 
   if (!loading) {
     // Calculate prices for ORDER SUMMARY
@@ -44,6 +63,10 @@ const OrderScreen = ({ match }) => {
   }, [dispatch, order, orderId]);
 
   useEffect(() => {
+    if (!userInfo) {
+      history.push('/login');
+    }
+
     const addPayPalScript = async () => {
       const { data: clientId } = await axios.get('/api/config/paypal');
       const script = document.createElement('script');
@@ -56,8 +79,9 @@ const OrderScreen = ({ match }) => {
       document.body.appendChild(script);
     };
 
-    if (!order || successPay || order._id !== orderId) {
+    if (!order || successPay || successDeliver || order._id !== orderId) {
       dispatch({ type: ORDER_PAY_RESET });
+      dispatch({ type: ORDER_DELIVER_RESET });
 
       dispatch(getOrderDetails(orderId));
     } else if (!order.isPaid) {
@@ -67,10 +91,14 @@ const OrderScreen = ({ match }) => {
         setSdkReady(true);
       }
     }
-  }, [dispatch, orderId, successPay, order]);
+  }, [dispatch, orderId, successPay, successDeliver, order]);
 
   const successPaymentHandler = (paymentResult) => {
     dispatch(payOrder(orderId, paymentResult));
+  };
+
+  const deliverHandler = () => {
+    dispatch(deliverOrder(order));
   };
 
   return loading ? (
@@ -102,6 +130,18 @@ const OrderScreen = ({ match }) => {
               <p>{order.shippingAddress.country}</p>
               <strong> Contact Number:</strong>
               <p>{order.shippingAddress.phoneNumber}</p>
+
+              {userInfo.isAdmin && !order.isDelivered ? (
+                <Alert className="mt-3" variant="danger">
+                  Not Delivered
+                </Alert>
+              ) : userInfo.isAdmin && order.isDelivered ? (
+                <Alert className="mt-3" variant="success">
+                  Delivered on {order.deliveredAt}
+                </Alert>
+              ) : (
+                ''
+              )}
             </ListGroup.Item>
 
             <ListGroup.Item>
@@ -164,6 +204,21 @@ const OrderScreen = ({ match }) => {
                   )}
                 </ListGroup.Item>
               )}
+              {loadingDeliver && <Loader />}
+              {userInfo &&
+                userInfo.isAdmin &&
+                order.isPaid &&
+                !order.isDelivered && (
+                  <ListGroup.Item>
+                    <Button
+                      type="button"
+                      className="btn btn-block"
+                      onClick={deliverHandler}
+                    >
+                      Mark As Delivered
+                    </Button>
+                  </ListGroup.Item>
+                )}
             </ListGroup>
           </Card>
         </Col>
